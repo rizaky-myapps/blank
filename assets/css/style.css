@@ -304,6 +304,27 @@ ul { margin: 0; padding: 0; list-style: none; }
 .card-visual .logo { font-size: 17px; position: relative; }
 .card-visual .pan { letter-spacing: .14em; font-size: 15.5px; position: relative; font-variant-numeric: tabular-nums; }
 .card-visual .holder { display: flex; justify-content: space-between; font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; opacity: .9; position: relative; }
+a.card-visual { text-decoration: none; }
+.card-xl { max-width: 460px; margin: 0 auto; padding: 24px 26px; border-radius: 22px; box-shadow: var(--shadow-lg); }
+.card-xl .top { display: flex; justify-content: space-between; align-items: center; position: relative; }
+.card-xl .top .logo { font-size: 20px; }
+.card-xl .tag { font-size: 12px; font-weight: 650; background: rgba(255, 255, 255, .18); padding: 3px 11px; border-radius: 999px; }
+.card-xl .chip { width: 40px; height: 30px; border-radius: 7px; background: linear-gradient(135deg, #f5e7a8, #c9a94e); position: relative; }
+.card-xl .pan { font-size: clamp(17px, 5vw, 23px); letter-spacing: .12em; white-space: nowrap; }
+.card-xl .meta { display: flex; gap: 22px; font-size: 14px; font-weight: 650; letter-spacing: .04em; position: relative; text-transform: uppercase; }
+.card-xl .meta small { display: block; font-size: 10.5px; font-weight: 600; opacity: .75; letter-spacing: .08em; }
+.card-xl .meta > div { white-space: nowrap; }
+@media (max-width: 480px) {
+  .card-xl { padding: 18px; }
+  .card-xl .meta { gap: 12px; font-size: 12px; }
+  .card-xl .meta small { font-size: 9.5px; }
+  .card-xl .pan { letter-spacing: .08em; }
+}
+.card-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 22px; }
+.card-hint { text-align: center; max-width: 420px; margin: 14px auto 0; }
+.bar-row .hint { display: block; margin-top: 5px; }
+.kv.compact .kv-row { grid-template-columns: 130px 1fr; padding: 11px 0; }
+.kv.compact .kv-row dd { font-size: 14.5px; }
 .toggle-row { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 14px 0; border-top: 1px solid var(--line); font-size: 14.5px; }
 .toggle-row:first-of-type { margin-top: 16px; }
 .toggle-row small { display: block; color: var(--muted); font-size: 12.5px; }

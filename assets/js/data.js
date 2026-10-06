@@ -27,6 +27,7 @@
     domiciliation: 'BLANK – Agence en ligne',
     adresse: '12 place du Théâtre, 59000 Lille',
     telephone: '01 99 00 67 41',
+    oppositionTelephone: '01 99 00 67 42',
     email: 'contact@blank-banque.fr'
   };
 
@@ -45,7 +46,18 @@
     }
   };
 
-  var CARD = { label: 'Carte BLANK Classic', last4: '4821', expiration: '09/28', plafondPaiement: 2500, plafondRetrait: 500 };
+  var CARD = {
+    label: 'Carte BLANK Classic',
+    type: 'Débit immédiat',
+    number: '4970839946964821',
+    last4: '4821',
+    expiration: '09/28',
+    cvv: '507',
+    holder: 'THOMAS MARCHETTI',
+    issued: '2023-09-14',
+    plafondPaiement: 2500,
+    plafondRetrait: 500
+  };
 
   /* ---------- Prélèvements récurrents (mandats SEPA) ---------- */
   var MANDATES = [

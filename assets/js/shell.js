@@ -8,6 +8,7 @@
   var NAV = [
     { id: 'compte', href: 'compte.html', label: 'Mes comptes', icon: 'home' },
     { id: 'operations', href: 'operations.html', label: 'Opérations', icon: 'list' },
+    { id: 'carte', href: 'carte.html', label: 'Ma carte', icon: 'card' },
     { id: 'prelevements', href: 'prelevements.html', label: 'Prélèvements', icon: 'repeat' },
     { id: 'virements', href: 'virements.html', label: 'Virements', icon: 'send' },
     { id: 'rib', href: 'rib.html', label: 'Mon RIB', icon: 'id' }
@@ -51,7 +52,25 @@
   /* Utilitaires partagés par les pages */
   var ACRONYMS = ['EDF', 'MAIF', 'DGFIP', 'TCL', 'SNCF', 'CPAM', 'DAB', 'SEPA', 'SARL', 'AB', 'EU', 'CB', 'B.V.'];
   var COLORS = ['#ece9ff', '#e3f6ee', '#fff0d6', '#fde8ec', '#e2f0fb', '#f1ecdf', '#efe6fb'];
+  /* Réglages de la carte, partagés entre le tableau de bord et la page « Ma carte » */
+  var CARD_KEY = 'blank_card';
+  var CARD_DEFAULTS = { locked: false, online: true, contactless: true, abroad: false };
+
   window.UI = {
+    cardState: {
+      get: function () {
+        var s = B.local.get(CARD_KEY, {});
+        var out = {};
+        for (var k in CARD_DEFAULTS) out[k] = typeof s[k] === 'boolean' ? s[k] : CARD_DEFAULTS[k];
+        return out;
+      },
+      set: function (key, value) {
+        var s = UI.cardState.get();
+        s[key] = value;
+        B.local.set(CARD_KEY, s);
+        return s;
+      }
+    },
     cleanLabel: function (l) {
       return l.replace(/^(PRLV SEPA|CB|VIR SEPA RECU|VIR SEPA EMIS|VIR INST RECU|VIR INST EMIS|RETRAIT DAB)\s+/, '');
     },

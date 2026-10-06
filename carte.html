@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Ma carte · BLANK</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script>try { if (!sessionStorage.getItem('blank_auth')) location.replace('connexion.html'); } catch (e) { location.replace('connexion.html'); }</script>
+</head>
+<body class="app-body" data-page="carte">
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="scrim" id="scrim"></div>
+    <div class="app-main">
+      <header class="topbar" id="topbar"></header>
+      <main class="page"><div class="page-inner">
+        <div class="page-head">
+          <div><h1>Ma carte</h1><p id="cardSub"></p></div>
+          <button class="btn btn-ghost btn-sm" id="oppose"><span data-icon="alert"></span>Faire opposition</button>
+        </div>
+
+        <div class="dash-grid" style="margin-top:0">
+          <div>
+            <section class="panel">
+              <div class="card-visual card-xl" id="cardVisual" role="img" aria-label="Carte bancaire BLANK"></div>
+              <div class="card-actions">
+                <button class="btn btn-dark btn-sm" id="reveal"><span data-icon="lock"></span><span id="revealLabel">Afficher les données</span></button>
+                <button class="btn btn-ghost btn-sm" id="copyPan" disabled><span data-icon="copy"></span>Copier le numéro</button>
+              </div>
+              <p class="hint card-hint" id="cardHint">Pour votre sécurité, le numéro complet et le cryptogramme restent masqués. Ils se masquent à nouveau automatiquement après 30 secondes.</p>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head"><h2>Derniers paiements par carte</h2><a class="link" href="operations.html?type=carte">Tout voir</a></div>
+              <div id="cardOps"></div>
+            </section>
+          </div>
+
+          <div>
+            <section class="panel">
+              <div class="panel-head"><h2>Réglages</h2></div>
+              <div id="cardToggles"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head"><h2>Plafonds</h2></div>
+              <div class="bars" id="cardLimits"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head"><h2>Informations</h2></div>
+              <dl class="kv compact" id="cardInfo"></dl>
+            </section>
+          </div>
+        </div>
+      </div></main>
+    </div>
+  </div>
+
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/shell.js"></script>
+  <script src="assets/js/carte.js"></script>
+</body>
+</html>

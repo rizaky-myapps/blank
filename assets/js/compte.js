@@ -5,6 +5,7 @@
   var D = window.BLANK;
   var A = D.accounts;
   var el = document.getElementById('dash');
+  var cardState = UI.cardState.get();
 
   function maskIban(iban) { return iban.slice(0, 4) + ' •••• •••• •••• •••• ' + iban.slice(-3); }
 
@@ -59,12 +60,12 @@
         '<section class="panel"><div class="panel-head"><h2>Dernières opérations</h2><a class="link" href="operations.html">Tout voir</a></div>' + recentHtml + '</section>' +
       '</div>' +
       '<div>' +
-        '<section class="panel"><div class="panel-head"><h2>' + D.card.label + '</h2></div>' +
-          '<div class="card-visual" id="cardVisual"><span class="logo"><span class="logo-mark"></span>blank</span>' +
+        '<section class="panel"><div class="panel-head"><h2>' + D.card.label + '</h2><a class="link" href="carte.html">Gérer</a></div>' +
+          '<a class="card-visual' + (cardState.locked ? ' locked' : '') + '" id="cardVisual" href="carte.html" aria-label="Gérer ma carte"><span class="logo"><span class="logo-mark"></span>blank</span>' +
           '<span class="pan">•••• •••• •••• ' + D.card.last4 + '</span>' +
-          '<span class="holder"><span>' + B.esc(D.client.prenom + ' ' + D.client.nom) + '</span><span>' + D.card.expiration + '</span></span></div>' +
-          '<div class="toggle-row"><div>Verrouiller la carte<small>Bloque tous les paiements</small></div><label class="switch"><input type="checkbox" id="lockCard" aria-label="Verrouiller la carte"><span></span></label></div>' +
-          '<div class="toggle-row"><div>Paiements hors Europe<small>Plafond ' + B.eur(D.card.plafondPaiement) + ' / 30 jours</small></div><label class="switch"><input type="checkbox" id="abroad" aria-label="Paiements hors Europe"><span></span></label></div>' +
+          '<span class="holder"><span>' + B.esc(D.client.prenom + ' ' + D.client.nom) + '</span><span>' + D.card.expiration + '</span></span></a>' +
+          '<div class="toggle-row"><div>Verrouiller la carte<small>Bloque tous les paiements</small></div><label class="switch"><input type="checkbox" id="lockCard" aria-label="Verrouiller la carte"' + (cardState.locked ? ' checked' : '') + '><span></span></label></div>' +
+          '<div class="toggle-row"><div>Paiements hors Europe<small>Plafond ' + B.eur(D.card.plafondPaiement) + ' / 30 jours</small></div><label class="switch"><input type="checkbox" id="abroad" aria-label="Paiements hors Europe"' + (cardState.abroad ? ' checked' : '') + '><span></span></label></div>' +
         '</section>' +
         '<section class="panel"><div class="panel-head"><h2>Prochains prélèvements</h2><a class="link" href="prelevements.html">Gérer</a></div><ul class="upcoming">' +
           upcoming.map(function (m) {
@@ -80,10 +81,12 @@
     '</div>';
 
   document.getElementById('lockCard').addEventListener('change', function (e) {
+    UI.cardState.set('locked', e.target.checked);
     document.getElementById('cardVisual').classList.toggle('locked', e.target.checked);
     B.toast(e.target.checked ? 'Carte verrouillée. Aucun paiement ne sera accepté.' : 'Carte déverrouillée.');
   });
   document.getElementById('abroad').addEventListener('change', function (e) {
+    UI.cardState.set('abroad', e.target.checked);
     B.toast(e.target.checked ? 'Paiements hors Europe activés pour 30 jours.' : 'Paiements hors Europe désactivés.');
   });
 })();
