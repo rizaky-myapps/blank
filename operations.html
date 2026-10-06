@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Opérations · BLANK</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script>try { if (!sessionStorage.getItem('blank_auth')) location.replace('connexion.html'); } catch (e) { location.replace('connexion.html'); }</script>
+</head>
+<body class="app-body" data-page="operations">
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="scrim" id="scrim"></div>
+    <div class="app-main">
+      <header class="topbar" id="topbar"></header>
+      <main class="page"><div class="page-inner">
+        <div class="page-head">
+          <div><h1>Opérations</h1><p>Compte courant · historique des 4 derniers mois</p></div>
+          <button class="btn btn-ghost btn-sm" id="exportCsv"><span data-icon="download"></span>Exporter (CSV)</button>
+        </div>
+        <section class="panel">
+          <div class="filters">
+            <input class="input" id="q" type="search" placeholder="Rechercher une opération" aria-label="Rechercher une opération">
+            <select class="select" id="kind" aria-label="Type d'opération">
+              <option value="all">Tous les types</option>
+              <option value="carte">Paiements par carte</option>
+              <option value="prelevement">Prélèvements</option>
+              <option value="virement">Virements</option>
+              <option value="retrait">Retraits</option>
+            </select>
+            <select class="select" id="period" aria-label="Période">
+              <option value="30">30 derniers jours</option>
+              <option value="60">60 derniers jours</option>
+              <option value="0" selected>Toute la période</option>
+            </select>
+          </div>
+          <div class="sumbar" id="opsSum"></div>
+          <div id="opsList"></div>
+        </section>
+      </div></main>
+    </div>
+  </div>
+
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/shell.js"></script>
+  <script src="assets/js/operations.js"></script>
+</body>
+</html>

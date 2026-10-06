@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Virements · BLANK</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script>try { if (!sessionStorage.getItem('blank_auth')) location.replace('connexion.html'); } catch (e) { location.replace('connexion.html'); }</script>
+</head>
+<body class="app-body" data-page="virements">
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="scrim" id="scrim"></div>
+    <div class="app-main">
+      <header class="topbar" id="topbar"></header>
+      <main class="page"><div class="page-inner">
+        <div class="page-head">
+          <div><h1>Virements</h1><p>Envoyez de l'argent en toute sécurité</p></div>
+        </div>
+        <div class="dash-grid" style="margin-top:0">
+          <section class="panel">
+            <div class="panel-head"><h2>Nouveau virement</h2></div>
+            <div id="vErr"></div>
+            <form id="vForm" novalidate>
+              <div class="steps-form">
+                <div class="field full"><label for="from">Compte à débiter</label><select class="select" id="from" disabled></select></div>
+                <div class="field full"><label for="benef">Bénéficiaire</label><select class="select" id="benef"></select></div>
+                <div id="newBenef" class="steps-form" style="grid-column:1/-1" hidden>
+                  <div class="field full"><label for="nName">Nom du bénéficiaire</label><input class="input" id="nName" autocomplete="off"></div>
+                  <div class="field full"><label for="nIban">IBAN</label><input class="input num" id="nIban" placeholder="FR76 ..." autocomplete="off"></div>
+                </div>
+                <div class="field"><label for="amount">Montant</label><div class="amount-input"><input class="input" id="amount" inputmode="decimal" placeholder="0,00" autocomplete="off"></div></div>
+                <div class="field"><label for="motif">Motif (facultatif)</label><input class="input" id="motif" maxlength="35" autocomplete="off"></div>
+              </div>
+              <button class="btn btn-primary" type="submit">Continuer</button>
+            </form>
+          </section>
+          <section class="panel">
+            <div class="panel-head"><h2>Virements en cours</h2></div>
+            <div id="pending"></div>
+          </section>
+        </div>
+      </div></main>
+    </div>
+  </div>
+
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/shell.js"></script>
+  <script src="assets/js/virements.js"></script>
+</body>
+</html>

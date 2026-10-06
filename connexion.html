@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Connexion · BLANK</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <div class="auth">
+    <aside class="auth-aside">
+      <a class="logo on-dark" href="index.html" aria-label="BLANK, retour à l'accueil"><span class="logo-mark"></span>blank</a>
+      <div>
+        <h1>Content de vous revoir.</h1>
+        <p>Retrouvez vos comptes, votre carte et vos opérations en quelques secondes.</p>
+      </div>
+      <div class="secure"><span data-icon="lock"></span>Connexion sécurisée · Clavier virtuel</div>
+    </aside>
+
+    <main class="auth-main">
+      <div class="auth-box">
+        <h2>Espace client</h2>
+        <p>Connectez-vous avec votre identifiant et votre code secret.</p>
+        <div id="banner"></div>
+
+        <form id="loginForm" novalidate autocomplete="off">
+          <div class="field">
+            <label for="identifiant">Identifiant client</label>
+            <input class="input num" id="identifiant" name="identifiant" inputmode="numeric" maxlength="10" placeholder="10 chiffres" autocomplete="off" autofocus>
+            <div class="error-msg" id="idErr" role="alert"></div>
+          </div>
+
+          <div class="field">
+            <span class="label" id="codeLabel">Code secret</span>
+            <div class="code-dots" id="dots" role="img" aria-labelledby="codeLabel"></div>
+            <div class="keypad" id="keypad"></div>
+            <span class="hint">Cliquez sur les chiffres du clavier ci-dessus pour saisir votre code à 6 chiffres.</span>
+          </div>
+
+          <button class="btn btn-primary btn-lg btn-block" id="submit" type="submit" disabled>Se connecter</button>
+        </form>
+
+        <div class="auth-links">
+          <a href="#" data-help="id">Identifiant oublié ?</a>
+          <a href="#" data-help="code">Code secret oublié ?</a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/login.js"></script>
+</body>
+</html>

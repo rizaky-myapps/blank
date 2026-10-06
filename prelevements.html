@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Prélèvements · BLANK</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script>try { if (!sessionStorage.getItem('blank_auth')) location.replace('connexion.html'); } catch (e) { location.replace('connexion.html'); }</script>
+</head>
+<body class="app-body" data-page="prelevements">
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="scrim" id="scrim"></div>
+    <div class="app-main">
+      <header class="topbar" id="topbar"></header>
+      <main class="page"><div class="page-inner">
+        <div class="page-head">
+          <div><h1>Prélèvements</h1><p>Vos mandats de prélèvement SEPA et leurs échéances</p></div>
+        </div>
+        <section class="panel">
+          <div class="sumbar" id="mandSum"></div>
+          <table class="tbl">
+            <thead><tr><th>Créancier</th><th>Référence</th><th>Montant</th><th>Prochain</th><th>Statut</th><th><span class="sr-only">Actions</span></th></tr></thead>
+            <tbody id="mandBody"></tbody>
+          </table>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><h2>Derniers prélèvements</h2><a class="link" href="operations.html?type=prelevement">Tout voir</a></div>
+          <div id="prlvHist"></div>
+        </section>
+      </div></main>
+    </div>
+  </div>
+
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/shell.js"></script>
+  <script src="assets/js/prelevements.js"></script>
+</body>
+</html>
