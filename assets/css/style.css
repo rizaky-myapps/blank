@@ -253,6 +253,9 @@ ul { margin: 0; padding: 0; list-style: none; }
 .page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 26px; }
 .page-head h1 { font-size: 30px; font-weight: 800; letter-spacing: -.04em; }
 .page-head p { color: var(--muted); margin-top: 4px; }
+.page-head .total { text-align: right; }
+.page-head .total small { display: block; color: var(--muted); font-size: 12.5px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; }
+.page-head .total b { font-size: 26px; font-weight: 800; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
 .scrim { display: none; }
 
 .panel { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 24px; }

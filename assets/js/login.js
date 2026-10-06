@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  var ACCESS = window.BLANK.access;
+  var ACCESS = window.BLANK.accessList;
   var CODE_LEN = 6;
   var form = document.getElementById('loginForm');
   var idInput = document.getElementById('identifiant');
@@ -12,6 +12,12 @@
   var banner = document.getElementById('banner');
   var submit = document.getElementById('submit');
   var code = '';
+
+  /* Purge des données locales (paramètre technique) */
+  if (new URLSearchParams(location.search).get('reinit')) {
+    window.BLANK.reset();
+    try { history.replaceState(null, '', location.pathname); } catch (e) { /* noop */ }
+  }
 
   if (B.session.get('blank_auth', false)) { location.replace('compte.html'); return; }
   if (new URLSearchParams(location.search).get('deconnexion')) {
@@ -78,7 +84,9 @@
     submit.disabled = true;
     submit.innerHTML = '<span class="spinner"></span>Vérification…';
     setTimeout(function () {
-      if (idInput.value === ACCESS.identifiant && code === ACCESS.code) {
+      var who = ACCESS.filter(function (a) { return a.identifiant === idInput.value && a.code === code; })[0];
+      if (who) {
+        B.session.set('blank_user', who.key);
         B.session.set('blank_auth', true);
         submit.classList.add('btn-ok');
         submit.innerHTML = '<span class="tick">' + B.icon('check') + '</span>Connect\u00e9';

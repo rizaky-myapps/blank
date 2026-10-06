@@ -3,7 +3,7 @@
   'use strict';
 
   var D = window.BLANK;
-  var KEY = 'blank_revoked';
+  var KEY = 'blank_revoked_' + D.userKey;
   var revoked = B.local.get(KEY, []);
 
   var sumEl = document.getElementById('mandSum');

@@ -35,7 +35,7 @@
   document.getElementById('topbar').innerHTML =
     '<button class="burger" id="burger" aria-label="Ouvrir le menu">' + B.icon('menu', 24) + '</button>' +
     logo +
-    '<div class="user-chip"><div class="who">' + B.esc(C.prenom + ' ' + C.nom) + '<small>Compte courant · •••• 3905</small></div>' +
+    '<div class="user-chip"><div class="who">' + B.esc(C.prenom + ' ' + C.nom) + '<small>Compte courant · •••• ' + B.esc(window.BLANK.accounts.courant.numero.slice(-4)) + '</small></div>' +
     '<div class="avatar" aria-hidden="true">' + initials + '</div></div>';
 
   function setNav(open) { document.body.classList.toggle('nav-open', open); }
@@ -46,6 +46,7 @@
   document.getElementById('logout').addEventListener('click', function (e) {
     e.preventDefault();
     B.session.del('blank_auth');
+    B.session.del('blank_user');
     location.href = 'connexion.html?deconnexion=1';
   });
 
@@ -53,7 +54,7 @@
   var ACRONYMS = ['EDF', 'MAIF', 'DGFIP', 'TCL', 'SNCF', 'CPAM', 'DAB', 'SEPA', 'SARL', 'AB', 'EU', 'CB', 'B.V.'];
   var COLORS = ['#ece9ff', '#e3f6ee', '#fff0d6', '#fde8ec', '#e2f0fb', '#f1ecdf', '#efe6fb'];
   /* Réglages de la carte, partagés entre le tableau de bord et la page « Ma carte » */
-  var CARD_KEY = 'blank_card';
+  var CARD_KEY = 'blank_card_' + window.BLANK.userKey;
   var CARD_DEFAULTS = { locked: false, online: true, contactless: true, abroad: false };
 
   window.UI = {

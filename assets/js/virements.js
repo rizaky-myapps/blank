@@ -3,19 +3,21 @@
   'use strict';
 
   var D = window.BLANK;
-  var KEY = 'blank_pending_transfers';
   var form = document.getElementById('vForm');
   var benef = document.getElementById('benef');
+  var fromEl = document.getElementById('from');
   var newBox = document.getElementById('newBenef');
-  var pendingEl = document.getElementById('pending');
+  var recentEl = document.getElementById('recent');
   var errEl = document.getElementById('vErr');
+  var submitBtn = form.querySelector('button[type=submit]');
 
   benef.innerHTML = D.beneficiaries.map(function (b) {
-    return '<option value="' + b.id + '">' + B.esc(b.name) + ' · ' + b.iban.slice(0, 4) + ' •••• ' + b.iban.slice(-4) + '</option>';
+    return '<option value="' + B.esc(b.id) + '">' + B.esc(b.name) + ' · ' + b.iban.slice(0, 4) + ' •••• ' + b.iban.slice(-4) + '</option>';
   }).join('') + '<option value="new">+ Nouveau bénéficiaire</option>';
 
-  document.getElementById('from').innerHTML =
-    '<option>' + B.esc(D.accounts.courant.label) + ' · ' + B.eur(D.accounts.courant.solde) + '</option>';
+  function renderFrom() {
+    fromEl.innerHTML = '<option>' + B.esc(D.accounts.courant.label) + ' · ' + B.esc(B.eur(D.accounts.courant.solde)) + '</option>';
+  }
 
   benef.addEventListener('change', function () { newBox.hidden = benef.value !== 'new'; });
 
@@ -36,7 +38,7 @@
   function groupIban(s) { return s.replace(/\s+/g, '').toUpperCase().replace(/(.{4})/g, '$1 ').trim(); }
 
   function fail(msg, field) {
-    errEl.innerHTML = '<div class="alert alert-err">' + B.icon('alert') + '<span>' + B.esc(msg) + '</span></div>';
+    errEl.innerHTML = '<div class="alert alert-err" role="alert">' + B.icon('alert') + '<span>' + B.esc(msg) + '</span></div>';
     if (field) field.focus();
   }
 
@@ -46,7 +48,7 @@
       name = document.getElementById('nName').value.trim();
       iban = document.getElementById('nIban').value;
       if (name.length < 2) return fail('Indiquez le nom du bénéficiaire.', document.getElementById('nName'));
-      if (!ibanValid(iban)) return fail("L'IBAN saisi n'est pas valide. Vérifiez-le et réessayez.", document.getElementById('nIban'));
+      if (!ibanValid(iban)) return fail('L’IBAN saisi n’est pas valide. Vérifiez-le et réessayez.', document.getElementById('nIban'));
       iban = groupIban(iban);
     } else {
       var b = D.beneficiaries.filter(function (x) { return x.id === benef.value; })[0];
@@ -54,9 +56,14 @@
     }
     var amountEl = document.getElementById('amount');
     var amount = parseFloat(amountEl.value.replace(/\s/g, '').replace(',', '.'));
-    if (!(amount > 0)) return fail('Saisissez un montant supérieur à 0 €.', amountEl);
+    if (!(amount > 0)) return fail('Saisissez un montant supérieur à 0 €.', amountEl);
     if (amount > D.accounts.courant.solde) return fail('Le montant dépasse le solde disponible de votre compte.', amountEl);
+    if (iban.replace(/\s/g, '') === D.accounts.courant.iban) return fail('Le compte bénéficiaire doit être différent du compte à débiter.', benef.value === 'new' ? document.getElementById('nIban') : benef);
     return { name: name, iban: iban, amount: Math.round(amount * 100) / 100, motif: document.getElementById('motif').value.trim() };
+  }
+
+  function recap(rows) {
+    return '<div class="recap">' + rows.map(function (r) { return '<div><span>' + B.esc(r[0]) + '</span><b>' + B.esc(r[1]) + '</b></div>'; }).join('') + '</div>';
   }
 
   form.addEventListener('submit', function (e) {
@@ -64,44 +71,59 @@
     errEl.innerHTML = '';
     var t = readForm();
     if (!t) return;
-    var rows = [['Bénéficiaire', t.name], ['IBAN', t.iban], ['Montant', B.eur(t.amount)], ['Motif', t.motif || '—'], ['Exécution', 'Dès validation']];
     B.modal({
       title: 'Confirmer le virement',
-      body: '<div class="recap">' + rows.map(function (r) { return '<div><span>' + B.esc(r[0]) + '</span><b>' + B.esc(r[1]) + '</b></div>'; }).join('') + '</div>',
+      body: recap([['Compte à débiter', D.accounts.courant.label], ['Bénéficiaire', t.name], ['IBAN', t.iban], ['Montant', B.eur(t.amount)], ['Motif', t.motif || '—'], ['Exécution', 'Immédiate']]),
       actions: [
         { label: 'Modifier', cls: 'btn-ghost' },
-        { label: 'Confirmer', cls: 'btn-primary', onClick: function (close) { close(); submit(t); } }
+        { label: 'Confirmer', cls: 'btn-primary', onClick: function (close) { close(); execute(t); } }
       ]
     });
   });
 
-  function submit(t) {
-    var list = B.local.get(KEY, []);
-    t.id = 'VIR-' + Date.now().toString().slice(-8);
-    t.date = Date.now();
-    list.unshift(t);
-    B.local.set(KEY, list.slice(0, 20));
-    form.reset();
-    newBox.hidden = true;
-    renderPending();
-    B.modal({
-      title: 'Virement enregistré',
-      body: '<p>Votre virement de <b>' + B.eur(t.amount) + '</b> vers <b>' + B.esc(t.name) + '</b> a bien été enregistré.</p>' +
-        "<p>Pour votre sécurité, il est soumis à une vérification par notre service conformité. Délai habituel : 2 à 3 jours ouvrés. Vous serez prévenu par e-mail dès son exécution.</p>",
-      actions: [{ label: 'Compris', cls: 'btn-dark' }]
-    });
+  var ERRORS = {
+    funds: 'Le montant dépasse le solde disponible de votre compte.',
+    amount: 'Saisissez un montant supérieur à 0 €.',
+    same: 'Le compte bénéficiaire doit être différent du compte à débiter.'
+  };
+
+  function execute(t) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner"></span>Exécution…';
+    setTimeout(function () {
+      var res = D.transfer({ toName: t.name, toIban: t.iban, amount: t.amount, motif: t.motif });
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Continuer';
+      if (!res.ok) { fail(ERRORS[res.error] || 'Le virement n’a pas pu être exécuté.'); return; }
+      form.reset();
+      newBox.hidden = true;
+      renderFrom();
+      renderRecent(true);
+      B.modal({
+        title: 'Virement exécuté',
+        body: '<p>Votre virement instantané de <b>' + B.esc(B.eur(res.amount)) + '</b> vers <b>' + B.esc(res.name) + '</b> a bien été exécuté. Les fonds sont disponibles immédiatement chez le bénéficiaire.</p>' +
+          recap([['Référence', res.ref], ['Montant débité', B.eur(res.amount)], ['Nouveau solde', B.eur(res.balance)]]),
+        actions: [{ label: 'Terminé', cls: 'btn-dark' }]
+      });
+    }, Motion.reduce ? 0 : 900);
   }
 
-  function renderPending() {
-    var list = B.local.get(KEY, []);
-    if (!list.length) { pendingEl.innerHTML = '<div class="empty">Aucun virement en cours.</div>'; return; }
-    pendingEl.innerHTML = list.map(function (t) {
-      return '<div class="op"><div class="op-ico" style="background:' + UI.tint(t.name) + '" aria-hidden="true">' + B.esc(UI.initials(t.name)) + '</div>' +
-        '<div class="op-main"><div class="op-label">' + B.esc(t.name) + '</div><div class="op-meta">' + B.esc(t.id) + ' · ' + B.esc(B.dateShort(new Date(t.date))) +
-        '<span class="pill warn">' + B.icon('clock', 12) + 'En vérification</span></div></div>' +
-        '<div class="op-amt num">' + B.eurSigned(-t.amount) + '</div></div>';
+  function renderRecent(animate) {
+    var list = D.operations.filter(function (o) { return o.kind === 'virement'; }).slice(0, 8);
+    if (!list.length) { recentEl.innerHTML = '<div class="empty">Aucun virement récent.</div>'; return; }
+    var last = null;
+    recentEl.innerHTML = list.map(function (o) {
+      var lbl = B.dayLabel(o.date), head = '';
+      if (lbl !== last) { head = '<div class="day">' + B.esc(lbl) + '</div>'; last = lbl; }
+      return head + UI.opRow(o);
     }).join('');
+    if (animate) {
+      recentEl.classList.add('stagger');
+      Motion.stagger(recentEl, '.op, .day', 8);
+      setTimeout(function () { recentEl.classList.remove('stagger'); }, 1200);
+    }
   }
 
-  renderPending();
+  renderFrom();
+  renderRecent(false);
 })();

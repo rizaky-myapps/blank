@@ -7,6 +7,15 @@
   var el = document.getElementById('dash');
   var cardState = UI.cardState.get();
 
+  function savingsCard(s, wide) {
+    return '<section class="acct sec"' + (wide ? ' style="grid-column:1/-1"' : '') + ' aria-label="' + B.esc(s.label) + '">' +
+      '<div class="label">' + B.icon('trend', 16) + B.esc(s.label) + ' <span class="pill acc">' + String(s.taux).replace('.', ',') + ' %</span></div>' +
+      '<div class="amount" data-count="' + s.solde + '" data-format="eur">' + B.eur(s.solde) + '</div>' +
+      '<div class="sub">Plafond ' + B.eur(s.plafond) + ' \u00b7 N\u00b0 \u2022\u2022\u2022\u2022 ' + s.numero.slice(-4) + '</div>' +
+      '<div class="actions"><a class="btn btn-ghost btn-sm" href="virements.html">Alimenter</a></div>' +
+    '</section>';
+  }
+
   function maskIban(iban) { return iban.slice(0, 4) + ' •••• •••• •••• •••• ' + iban.slice(-3); }
 
   var hour = new Date().getHours();
@@ -38,7 +47,8 @@
   }).join('');
 
   el.innerHTML =
-    '<div class="page-head"><div><h1>' + greeting + ', ' + B.esc(D.client.prenom) + '</h1><p>' + B.esc(todayStr.charAt(0).toUpperCase() + todayStr.slice(1)) + '</p></div></div>' +
+    '<div class="page-head"><div><h1>' + greeting + ', ' + B.esc(D.client.prenom) + '</h1><p>' + B.esc(todayStr.charAt(0).toUpperCase() + todayStr.slice(1)) + '</p></div>' +
+      '<div class="total"><small>Avoir total</small><b class="num" data-count="' + D.totalAssets() + '" data-format="eur">' + B.eur(D.totalAssets()) + '</b></div></div>' +
 
     '<div class="grid-2">' +
       '<section class="acct main" aria-label="Compte courant">' +
@@ -47,12 +57,7 @@
         '<div class="sub">' + maskIban(A.courant.iban) + '</div>' +
         '<div class="actions"><a class="btn btn-light btn-sm" href="virements.html">Faire un virement</a><a class="btn btn-ghost btn-sm" href="rib.html">Mon RIB</a></div>' +
       '</section>' +
-      '<section class="acct sec" aria-label="Livret">' +
-        '<div class="label">' + B.icon('trend', 16) + A.livret.label + ' <span class="pill acc">' + String(A.livret.taux).replace('.', ',') + ' %</span></div>' +
-        '<div class="amount" data-count="' + A.livret.solde + '" data-format="eur">' + B.eur(A.livret.solde) + '</div>' +
-        '<div class="sub">Plafond ' + B.eur(A.livret.plafond) + ' · N° •••• ' + A.livret.numero.slice(-4) + '</div>' +
-        '<div class="actions"><a class="btn btn-ghost btn-sm" href="virements.html">Alimenter</a></div>' +
-      '</section>' +
+      A.savings.map(function (s, i) { return savingsCard(s, (A.savings.length + 1) % 2 === 1 && i === A.savings.length - 1); }).join('') +
     '</div>' +
 
     '<div class="dash-grid">' +
