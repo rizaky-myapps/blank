@@ -5,49 +5,146 @@
   var D = window.BLANK;
   var C = D.card;
   var A = D.accounts.courant;
-  var AUTO_HIDE_MS = 30000;
+  var AUTO_HIDE_S = 30;
+  var MASKED_PAN = '•••• •••• •••• ' + C.last4;
+  var MASKED_CVV = '•••';
 
-  var visual = document.getElementById('cardVisual');
+  var card = document.getElementById('card3d');
   var revealBtn = document.getElementById('reveal');
   var revealLabel = document.getElementById('revealLabel');
-  var copyBtn = document.getElementById('copyPan');
+  var flipBtn = document.getElementById('flipBtn');
+  var copyBtns = [document.getElementById('copyPan'), document.getElementById('copyExp'), document.getElementById('copyCvv')];
+  var autohide = document.getElementById('autohide');
+  var autohideLabel = document.getElementById('autohideLabel');
+  var countEl = document.getElementById('count');
+  var live = document.getElementById('cardLive');
+
   var revealed = false;
+  var flipped = false;
+  var busy = false;
   var hideTimer = null;
+  var tickTimer = null;
+  var panEl, cvvEl, tagEl;
 
   document.getElementById('cardSub').textContent = C.label + ' · ' + C.type.toLowerCase();
 
   function group(n) { return n.replace(/(.{4})/g, '$1 ').trim(); }
 
-  function renderCard() {
+  /* Les chiffres « défilent » avant de se fixer sur la bonne valeur */
+  function scramble(el, finalText, ms) {
+    if (Motion.reduce || !window.requestAnimationFrame) { el.textContent = finalText; return; }
+    var t0 = null;
+    window.requestAnimationFrame(function tick(ts) {
+      if (t0 === null) t0 = ts;
+      var p = Math.min(1, (ts - t0) / ms);
+      var out = '';
+      for (var i = 0; i < finalText.length; i++) {
+        var ch = finalText.charAt(i);
+        out += (ch === ' ' || p >= (i + 1) / finalText.length) ? ch : String(Math.floor(Math.random() * 10));
+      }
+      el.textContent = out;
+      if (p < 1) window.requestAnimationFrame(tick);
+    });
+  }
+
+  function build() {
+    card.innerHTML =
+      '<div class="tilt" id="cardTilt"><div class="flip">' +
+        '<div class="face front">' +
+          '<div class="top"><span class="logo"><span class="logo-mark"></span>blank</span><span class="tag" id="cardTag"></span></div>' +
+          '<span class="chip"></span>' +
+          '<span class="pan" id="cardPan"></span>' +
+          '<div class="meta"><div><small>Titulaire</small>' + B.esc(C.holder) + '</div><div><small>Expire fin</small>' + B.esc(C.expiration) + '</div></div>' +
+        '</div>' +
+        '<div class="face back">' +
+          '<div class="stripe"></div>' +
+          '<div class="sig"><div class="paper">' + B.esc(C.holder) + '</div><div class="cvv"><small>CVV</small><span id="cardCvv"></span></div></div>' +
+          '<p class="fine"><b>BLANK SAS</b> · Carte à débit immédiat.<br>Perte ou vol : ' + B.esc(D.bank.oppositionTelephone) + ' (24 h/24)</p>' +
+        '</div>' +
+      '</div></div>';
+    panEl = document.getElementById('cardPan');
+    cvvEl = document.getElementById('cardCvv');
+    tagEl = document.getElementById('cardTag');
+    Motion.tilt(document.getElementById('cardTilt'), { host: card, max: 8 });
+  }
+
+  function paint() {
     var st = UI.cardState.get();
-    visual.classList.toggle('locked', st.locked);
-    var pan = revealed ? group(C.number) : '•••• •••• •••• ' + C.last4;
-    var cvv = revealed ? C.cvv : '•••';
-    visual.innerHTML =
-      '<div class="top"><span class="logo"><span class="logo-mark"></span>blank</span><span class="tag">' + (st.locked ? 'Verrouillée' : B.esc(C.type)) + '</span></div>' +
-      '<span class="chip"></span>' +
-      '<span class="pan">' + pan + '</span>' +
-      '<div class="meta"><div><small>Titulaire</small>' + B.esc(C.holder) + '</div><div><small>Expire fin</small>' + B.esc(C.expiration) + '</div><div><small>CVV</small>' + cvv + '</div></div>';
-    visual.setAttribute('aria-label', 'Carte bancaire BLANK se terminant par ' + C.last4 + (st.locked ? ', verrouillée' : ''));
+    card.classList.toggle('locked', st.locked);
+    card.classList.toggle('flipped', flipped);
+    card.setAttribute('aria-pressed', String(flipped));
+    card.setAttribute('aria-label', 'Carte bancaire BLANK se terminant par ' + C.last4 + (st.locked ? ', verrouillée' : '') + '. ' + (flipped ? 'Affichage du verso.' : 'Affichage du recto.') + ' Activer pour la retourner.');
+    tagEl.textContent = st.locked ? 'Verrouillée' : C.type;
+    flipBtn.querySelector('span:last-child').textContent = flipped ? 'Voir le recto' : 'Voir le verso';
+  }
+
+  function setFlipped(on) { flipped = on; paint(); }
+
+  function stopCountdown() {
+    clearTimeout(hideTimer);
+    clearInterval(tickTimer);
+    autohide.hidden = true;
+    autohideLabel.hidden = true;
+  }
+
+  function startCountdown() {
+    stopCountdown();
+    var left = AUTO_HIDE_S;
+    autohide.innerHTML = '<i></i>';
+    autohide.hidden = false;
+    autohideLabel.hidden = false;
+    countEl.textContent = String(left);
+    tickTimer = setInterval(function () { left -= 1; countEl.textContent = String(Math.max(left, 0)); }, 1000);
+    hideTimer = setTimeout(function () { setRevealed(false); B.toast('Les données de la carte ont été masquées.'); }, AUTO_HIDE_S * 1000);
   }
 
   function setRevealed(on) {
     revealed = on;
-    clearTimeout(hideTimer);
     revealLabel.textContent = on ? 'Masquer les données' : 'Afficher les données';
-    copyBtn.disabled = !on;
-    if (on) hideTimer = setTimeout(function () { setRevealed(false); }, AUTO_HIDE_MS);
-    renderCard();
+    copyBtns.forEach(function (b) { b.disabled = !on; });
+    if (on) {
+      scramble(panEl, group(C.number), 750);
+      scramble(cvvEl, C.cvv, 600);
+      live.textContent = 'Données de la carte affichées.';
+      startCountdown();
+    } else {
+      panEl.textContent = MASKED_PAN;
+      cvvEl.textContent = MASKED_CVV;
+      live.textContent = 'Données de la carte masquées.';
+      stopCountdown();
+      if (flipped) setFlipped(false);
+    }
   }
 
   revealBtn.addEventListener('click', function () {
+    if (busy) return;
     if (revealed) { setRevealed(false); return; }
+    busy = true;
     revealBtn.disabled = true;
     revealLabel.textContent = 'Vérification…';
-    setTimeout(function () { revealBtn.disabled = false; setRevealed(true); }, 800);
+    setTimeout(function () { busy = false; revealBtn.disabled = false; setRevealed(true); }, 800);
   });
 
-  copyBtn.addEventListener('click', function () { B.copy(C.number, 'Numéro de carte copié'); });
+  /* Retourner la carte : clic, Entrée / Espace, ou bouton dédié */
+  card.addEventListener('click', function () { setFlipped(!flipped); });
+  card.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setFlipped(!flipped); }
+  });
+  flipBtn.addEventListener('click', function () { setFlipped(!flipped); });
+
+  /* Copie, avec retour visuel sur le bouton */
+  function wireCopy(btn, value, okMsg, label) {
+    btn.addEventListener('click', function () {
+      if (!revealed) return;
+      B.copy(value, okMsg);
+      var span = btn.querySelector('span:last-child');
+      span.textContent = 'Copié ✓';
+      setTimeout(function () { span.textContent = label; }, 1400);
+    });
+  }
+  wireCopy(copyBtns[0], C.number, 'Numéro de carte copié', 'Numéro');
+  wireCopy(copyBtns[1], C.expiration, 'Date d’expiration copiée', 'Date');
+  wireCopy(copyBtns[2], C.cvv, 'Cryptogramme copié', 'CVV');
 
   /* Réglages */
   var TOGGLES = [
@@ -71,7 +168,7 @@
     var t = TOGGLES.filter(function (x) { return x.key === key; })[0];
     UI.cardState.set(key, e.target.checked);
     B.toast(e.target.checked ? t.on : t.off);
-    renderCard();
+    paint();
   });
 
   /* Plafonds */
@@ -103,11 +200,14 @@
 
   /* Derniers paiements par carte */
   var last = null;
-  document.getElementById('cardOps').innerHTML = D.operations.filter(function (o) { return o.kind === 'carte'; }).slice(0, 8).map(function (o) {
+  var cardOps = document.getElementById('cardOps');
+  cardOps.innerHTML = D.operations.filter(function (o) { return o.kind === 'carte'; }).slice(0, 8).map(function (o) {
     var lbl = B.dayLabel(o.date), head = '';
     if (lbl !== last) { head = '<div class="day">' + B.esc(lbl) + '</div>'; last = lbl; }
     return head + UI.opRow(o);
   }).join('');
+  cardOps.classList.add('stagger');
+  Motion.stagger(cardOps, '.op, .day', 12);
 
   /* Opposition */
   document.getElementById('oppose').addEventListener('click', function () {
@@ -119,13 +219,20 @@
         { label: 'Fermer', cls: 'btn-ghost' },
         { label: 'Verrouiller ma carte', cls: 'btn-primary', onClick: function (close) {
           UI.cardState.set('locked', true);
-          close(); renderToggles(); renderCard();
+          close(); renderToggles(); paint();
           B.toast('Carte verrouillée. Aucun paiement ne sera accepté.');
         } }
       ]
     });
   });
 
+  build();
   renderToggles();
-  renderCard();
+  panEl.textContent = MASKED_PAN;
+  cvvEl.textContent = MASKED_CVV;
+  paint();
+  if (!Motion.reduce) {
+    card.classList.add('hint-wiggle');
+    setTimeout(function () { card.classList.remove('hint-wiggle'); }, 2400);
+  }
 })();

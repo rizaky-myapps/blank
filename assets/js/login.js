@@ -80,10 +80,13 @@
     setTimeout(function () {
       if (idInput.value === ACCESS.identifiant && code === ACCESS.code) {
         B.session.set('blank_auth', true);
-        location.href = 'compte.html';
+        submit.classList.add('btn-ok');
+        submit.innerHTML = '<span class="tick">' + B.icon('check') + '</span>Connect\u00e9';
+        setTimeout(function () { location.href = 'compte.html'; }, Motion.reduce ? 0 : 520);
         return;
       }
-      showError('Identifiant ou code secret incorrect. Vérifiez vos informations et réessayez.');
+      showError('Identifiant ou code secret incorrect. V\u00e9rifiez vos informations et r\u00e9essayez.');
+      [dots, pad].forEach(function (n) { n.classList.remove('shake'); void n.offsetWidth; n.classList.add('shake'); });
       code = '';
       buildPad();
       submit.textContent = 'Se connecter';

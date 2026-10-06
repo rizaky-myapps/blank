@@ -86,4 +86,6 @@
   }).join('');
 
   render();
+  histEl.classList.add('stagger');
+  Motion.stagger(histEl, '.op, .day', 12);
 })();

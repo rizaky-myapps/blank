@@ -61,4 +61,7 @@
   });
 
   render();
+  list.classList.add('stagger');
+  Motion.stagger(list, '.op, .day', 14);
+  setTimeout(function () { list.classList.remove('stagger'); }, 1400);
 })();

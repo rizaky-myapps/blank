@@ -17,6 +17,8 @@
     if (e.target.tagName === 'A') { menu.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false'); }
   });
 
+  Motion.tilt(document.querySelector('.bank-card'), { host: document.querySelector('.hero-visual'), max: 12 });
+
   document.getElementById('year').textContent = new Date().getFullYear();
 
   document.querySelectorAll('[data-open-account]').forEach(function (btn) {

@@ -7,6 +7,7 @@
   <title>Ma carte · BLANK</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/motion.css">
   <script>try { if (!sessionStorage.getItem('blank_auth')) location.replace('connexion.html'); } catch (e) { location.replace('connexion.html'); }</script>
 </head>
 <body class="app-body" data-page="carte">
@@ -24,12 +25,21 @@
         <div class="dash-grid" style="margin-top:0">
           <div>
             <section class="panel">
-              <div class="card-visual card-xl" id="cardVisual" role="img" aria-label="Carte bancaire BLANK"></div>
+              <div class="card3d" id="card3d" role="button" tabindex="0" aria-pressed="false"></div>
+              <p class="sr-only" id="cardLive" aria-live="polite"></p>
               <div class="card-actions">
                 <button class="btn btn-dark btn-sm" id="reveal"><span data-icon="lock"></span><span id="revealLabel">Afficher les données</span></button>
-                <button class="btn btn-ghost btn-sm" id="copyPan" disabled><span data-icon="copy"></span>Copier le numéro</button>
+                <button class="btn btn-ghost btn-sm" id="flipBtn"><span data-icon="refresh"></span><span>Voir le verso</span></button>
               </div>
-              <p class="hint card-hint" id="cardHint">Pour votre sécurité, le numéro complet et le cryptogramme restent masqués. Ils se masquent à nouveau automatiquement après 30 secondes.</p>
+              <div class="card-actions secondary">
+                <span class="copy-title">Copier</span>
+                <button class="btn btn-ghost btn-sm" id="copyPan" disabled><span data-icon="copy"></span><span>Numéro</span></button>
+                <button class="btn btn-ghost btn-sm" id="copyExp" disabled><span data-icon="copy"></span><span>Date</span></button>
+                <button class="btn btn-ghost btn-sm" id="copyCvv" disabled><span data-icon="copy"></span><span>CVV</span></button>
+              </div>
+              <div class="autohide" id="autohide" hidden></div>
+              <span class="autohide-label" id="autohideLabel" hidden>Masquage automatique dans <b id="count">30</b>&nbsp;s</span>
+              <p class="hint card-hint" id="cardHint">Cliquez sur la carte pour la retourner. Le numéro complet et le cryptogramme restent masqués tant que vous ne les affichez pas.</p>
             </section>
 
             <section class="panel">
@@ -60,6 +70,7 @@
   </div>
 
   <script src="assets/js/common.js"></script>
+  <script src="assets/js/motion.js"></script>
   <script src="assets/js/data.js"></script>
   <script src="assets/js/shell.js"></script>
   <script src="assets/js/carte.js"></script>

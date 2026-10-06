@@ -43,13 +43,13 @@
     '<div class="grid-2">' +
       '<section class="acct main" aria-label="Compte courant">' +
         '<div class="label">' + B.icon('card', 16) + A.courant.label + '</div>' +
-        '<div class="amount">' + B.eur(A.courant.solde) + '</div>' +
+        '<div class="amount" data-count="' + A.courant.solde + '" data-format="eur">' + B.eur(A.courant.solde) + '</div>' +
         '<div class="sub">' + maskIban(A.courant.iban) + '</div>' +
         '<div class="actions"><a class="btn btn-light btn-sm" href="virements.html">Faire un virement</a><a class="btn btn-ghost btn-sm" href="rib.html">Mon RIB</a></div>' +
       '</section>' +
       '<section class="acct sec" aria-label="Livret">' +
         '<div class="label">' + B.icon('trend', 16) + A.livret.label + ' <span class="pill acc">' + String(A.livret.taux).replace('.', ',') + ' %</span></div>' +
-        '<div class="amount">' + B.eur(A.livret.solde) + '</div>' +
+        '<div class="amount" data-count="' + A.livret.solde + '" data-format="eur">' + B.eur(A.livret.solde) + '</div>' +
         '<div class="sub">Plafond ' + B.eur(A.livret.plafond) + ' · N° •••• ' + A.livret.numero.slice(-4) + '</div>' +
         '<div class="actions"><a class="btn btn-ghost btn-sm" href="virements.html">Alimenter</a></div>' +
       '</section>' +
@@ -57,7 +57,7 @@
 
     '<div class="dash-grid">' +
       '<div>' +
-        '<section class="panel"><div class="panel-head"><h2>Dernières opérations</h2><a class="link" href="operations.html">Tout voir</a></div>' + recentHtml + '</section>' +
+        '<section class="panel stagger" id="recentOps"><div class="panel-head"><h2>Dernières opérations</h2><a class="link" href="operations.html">Tout voir</a></div>' + recentHtml + '</section>' +
       '</div>' +
       '<div>' +
         '<section class="panel"><div class="panel-head"><h2>' + D.card.label + '</h2><a class="link" href="carte.html">Gérer</a></div>' +
@@ -79,6 +79,10 @@
         '</div></section>' +
       '</div>' +
     '</div>';
+
+  Array.prototype.forEach.call(el.querySelectorAll('[data-count]'), function (n) { Motion.countUp(n); });
+  Motion.stagger(document.getElementById('recentOps'), '.op, .day', 10);
+  Motion.tilt(document.getElementById('cardVisual'), { max: 10 });
 
   document.getElementById('lockCard').addEventListener('change', function (e) {
     UI.cardState.set('locked', e.target.checked);
